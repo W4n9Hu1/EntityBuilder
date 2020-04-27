@@ -9,10 +9,9 @@ namespace EntityBuilderConsole
             string connStr = "";
             string tableName = "";
             var mysql = new MysqlService(connStr, tableName);
-            var context = new DbServiceContext(mysql);
-            string entitystr = context.BuildEntityStr();
-            string selectstr = context.BuildSelectStr();
-            string insertstr = context.BuildInsertStr();
+            string entitystr = mysql.BuildEntityStr();
+            string selectstr = mysql.BuildSelectStr();
+            string insertstr = mysql.BuildInsertStr();
         }
     }
 }

@@ -69,7 +69,6 @@
   <ItemGroup>
     <Compile Include="Base\BaseService.cs" />
     <Compile Include="Base\ColumnsInfo.cs" />
-    <Compile Include="Base\DbServiceContext.cs" />
     <Compile Include="Base\IDbService.cs" />
     <Compile Include="MysqlService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

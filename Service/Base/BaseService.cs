@@ -9,6 +9,7 @@ namespace Service
     {
         public string _tableName;
         public string _connStr;
+        public IEnumerable<ColumnsInfo> _columns;
 
         public BaseService(string connStr, string tableName)
         {
@@ -16,9 +17,9 @@ namespace Service
             _tableName = tableName;
         }
 
-        public string BuildEntityStr(IEnumerable<ColumnsInfo> columns)
+        public string BuildEntityStr()
         {
-            string tableName = columns.FirstOrDefault().TableName;
+            string tableName = _columns.FirstOrDefault().TableName;
             tableName = tableName.Substring(0, 1).ToUpper() + tableName.Substring(1);
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("/// <summary>");
@@ -26,7 +27,7 @@ namespace Service
             sb.AppendLine("/// </summary>");
             sb.AppendLine($"public class {tableName}");
             sb.AppendLine("{");
-            columns.ToList().ForEach(n =>
+            _columns.ToList().ForEach(n =>
             {
                 sb.AppendLine();
                 if (!string.IsNullOrEmpty(n.ColumnComment))
@@ -50,6 +51,9 @@ namespace Service
                     case "varchar":
                         typeName = "string";
                         break;
+                    case "decimal":
+                        typeName = "decimal";
+                        break;
                     case "timestamp":
                     case "datetime":
                     case "date":
@@ -66,34 +70,37 @@ namespace Service
             return sb.ToString();
         }
 
-        public string BuildSelectStr(IEnumerable<ColumnsInfo> columns)
+        public string BuildSelectStr()
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("SELECT");
-            foreach (var item in columns)
+            foreach (var item in _columns)
             {
                 sb.AppendLine("t." + item.ColumnName + ",");
             }
-            sb.AppendLine("from " + _tableName + " t");
-            return sb.ToString();
+            string sql = sb.ToString().Trim().TrimEnd(',');
+            sql += $"\r\nfrom {_tableName} t";
+            return sql;
         }
 
-
-        public string BuildInsertStr(IEnumerable<ColumnsInfo> columns)
+        public string BuildInsertStr()
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("INSERT INTO " + _tableName + " (");
-            foreach (var item in columns)
+            foreach (var item in _columns)
             {
                 sb.AppendLine(item.ColumnName + ",");
             }
-            sb.AppendLine(") VALUES (");
-            foreach (var item in columns)
+            string sql = sb.ToString().Trim().TrimEnd(',');
+            sql += "\r\n) VALUES ( \r\n";
+            sb = new StringBuilder();
+            foreach (var item in _columns)
             {
                 sb.AppendLine("@" + item.ColumnName + ",");
             }
-            sb.Append(");");
-            return sb.ToString();
+            sql += sb.ToString().Trim().TrimEnd(',');
+            sql += "\r\n);";
+            return sql;
         }
     }
 }

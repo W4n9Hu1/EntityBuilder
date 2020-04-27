@@ -6,9 +6,11 @@ namespace Service
 {
     public class MysqlService : BaseService, IDbService
     {
-        public MysqlService(string connStr,string tableName) : base(connStr,tableName) { }
+        public MysqlService(string connStr,string tableName) : base(connStr,tableName) {
+            GetColumnsInfo();
+        }
 
-        public IEnumerable<ColumnsInfo> GetColumnsInfo()
+        public void GetColumnsInfo()
         {
             string sql = $@"SELECT 
     TABLE_NAME TableName,
@@ -23,7 +25,7 @@ WHERE
             using (var conn = new MySqlConnection(_connStr))
             {
                 var columns = conn.Query<ColumnsInfo>(sql);
-                return columns;
+                _columns = columns;
             }
         }
     }
